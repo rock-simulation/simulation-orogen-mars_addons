@@ -1,4 +1,26 @@
 name 'mars_addons'
 
+using_library "osg_lines", :typekit => false
+
 using_task_library "mars"
 
+import_types_from "base"
+
+task_context "PathDrawer" do
+    subclasses "
+    mars::Plugin"
+
+    property('distance_to_ground', 'double', 0.0).
+        doc('Added offset to evaluated z-coordinate for each xy-coordinate')
+
+    input_port( "current_waypoint", "/base/Waypoint" ).
+        doc "current waypoint to draw"
+
+    input_port( "trajectories_2d", "/std/vector</base/Trajectory>" ).
+        doc "2d trajectories to draw"
+
+    output_port( "trajectories_3d", "/std/vector</base/Trajectory>" ).
+        doc "3d trajectories where the z-coordinate reflects the hightest point at each xy coordinate + distance_to_ground"
+
+    port_driven
+end
