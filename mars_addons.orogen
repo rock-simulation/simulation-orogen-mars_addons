@@ -7,8 +7,7 @@ using_task_library "mars"
 import_types_from "base"
 
 task_context "PathDrawer" do
-    subclasses "
-    mars::Plugin"
+    subclasses "mars::Plugin"
 
     property('distance_to_ground', 'double', 0.0).
         doc('Added offset to evaluated z-coordinate for each xy-coordinate')
