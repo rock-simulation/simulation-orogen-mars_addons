@@ -6,7 +6,7 @@
   <url>http://</url>
   <logo>http://</logo>
   <!-- Dependencies are resolved via osdep file in the autoproj configuration -->
-  <depend package="simulation/orogen/mars/" />
+  <depend package="simulation/orogen/mars" />
   <versioncontrol type="git" url="" />
   <export>
     <cpp cflags="" lflags="" />
