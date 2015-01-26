@@ -1,0 +1,4 @@
+name 'mars_addons'
+
+using_task_library "mars"
+
