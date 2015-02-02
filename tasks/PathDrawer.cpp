@@ -130,6 +130,7 @@ void PathDrawer::postGraphicsUpdate(void )
             } catch (std::runtime_error& e) {
                 LOG_ERROR_S << "Spline exception: " << e.what();
             }
+            new_trajectory.speed = it->speed;
             trajectories_3d.clear();
             trajectories_3d.push_back(new_trajectory);
         }
