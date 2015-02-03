@@ -29,10 +29,10 @@ bool PathDrawer::configureHook()
     if (! mars::Plugin::configureHook())
         return false;
     
-    // create the line handle
-    osg_lines::LinesFactory lF;
-    lines = lF.createLines();
-    point = lF.createLines();
+    // init the line handle
+    lines = 0;
+    updated_lines = 0;
+    point = 0;
 
     return true;
 }
@@ -41,15 +41,17 @@ bool PathDrawer::startHook()
 {
     if (! mars::Plugin::startHook())
         return false;
-    
-    control->graphics->addGraphicsUpdateInterface(this);
-
+    if(control->graphics){
+        control->graphics->addGraphicsUpdateInterface(this);
+    }
     return true;
 }
 
 void PathDrawer::updateHook()
 {
     mars::Plugin::updateHook();
+
+    generate_3d_path();
 }
 
 void PathDrawer::errorHook()
@@ -84,14 +86,51 @@ mars::interfaces::sReal PathDrawer::getHeightFromScene(mars::interfaces::sReal x
 
 void PathDrawer::postGraphicsUpdate(void )
 {
-   osg_lines::LinesFactory lF;
+    osg_lines::LinesFactory lF;
+    if(lines != updated_lines){
+        // clear old path
+        control->graphics->removeOSGNode(lines->getOSGNode());
+        delete lines;
+        lines = updated_lines;
 
+        // draw it
+        control->graphics->addOSGNode(lines->getOSGNode());
+    }
+
+    // get the current waypoint and draw it
+    base::Waypoint waypoint;
+    if(_current_waypoint.read(waypoint) == RTT::NewData){
+        // clear old waypoint
+        if(point == 0){
+            point = lF.createLines();
+            control->graphics->addOSGNode(point->getOSGNode());
+        }else{
+            // clear all points
+            point->setData(std::list<osg_lines::Vector>());
+        }
+        point->appendData(osg_lines::Vector(waypoint.position[0], waypoint.position[1], waypoint.position[2]));
+        point->appendData(osg_lines::Vector(waypoint.position[0], waypoint.position[1], waypoint.position[2]+0.5));
+        point->setColor(osg_lines::Color(1.0, 0.0, 0.0, 1.0));
+        point->setLineWidth(16);
+    }
+
+    // send the 3d trajectory when triggered
+    _trajectories_3d.write(trajectories_3d);
+
+}
+
+void PathDrawer::generate_3d_path()
+{
+   osg_lines::LinesFactory lF;
     // read the current trajectory
     std::vector<base::Trajectory> trajectories_2d;
     if(_trajectories_2d.read(trajectories_2d) == RTT::NewData){
         // clear old path
-        control->graphics->removeOSGNode(lines->getOSGNode());
-        lines = lF.createLines();
+        if(updated_lines != lines)
+        {
+            delete updated_lines;
+        }
+        updated_lines = lF.createLines();
 
         // get each xy coordinate
         std::vector<base::Trajectory>::iterator it;
@@ -115,7 +154,7 @@ void PathDrawer::postGraphicsUpdate(void )
                 v[1] = *(val+1);
                 v[2] = getHeightFromScene(v[0], v[1]) + _distance_to_ground.get();
                 //printf("adding point %g / %g\n", v[0], v[1]);
-                lines->appendData(osg_lines::Vector(v[0], v[1], v[2]));
+                updated_lines->appendData(osg_lines::Vector(v[0], v[1], v[2]));
 
                 // write the z-coridnate in the trajectory
                 coord_types.push_back(base::geometry::SplineBase::ORDINARY_POINT);
@@ -134,28 +173,11 @@ void PathDrawer::postGraphicsUpdate(void )
             trajectories_3d.clear();
             trajectories_3d.push_back(new_trajectory);
         }
-
-        // draw it
-        lines->setColor(osg_lines::Color(0.0, 1.0, 0.0, 1.0));
-        lines->setLineWidth(4);
-        control->graphics->addOSGNode(lines->getOSGNode());
+        updated_lines->setColor(osg_lines::Color(0.0, 1.0, 0.0, 1.0));
+        updated_lines->setLineWidth(4);
     }
 
-    // get the current waypoint and draw it
-    base::Waypoint waypoint;
-    if(_current_waypoint.read(waypoint) == RTT::NewData){
-        // clear old waypoint
-        control->graphics->removeOSGNode(point->getOSGNode());
-        point = lF.createLines();
-
-        point->appendData(osg_lines::Vector(waypoint.position[0], waypoint.position[1], waypoint.position[2]));
-        point->appendData(osg_lines::Vector(waypoint.position[0], waypoint.position[1], waypoint.position[2]+0.5));
-        point->setColor(osg_lines::Color(1.0, 0.0, 0.0, 1.0));
-        point->setLineWidth(16);
-        control->graphics->addOSGNode(point->getOSGNode());
-    }
 
     // send the 3d trajectory when triggered
     _trajectories_3d.write(trajectories_3d);
-
 }

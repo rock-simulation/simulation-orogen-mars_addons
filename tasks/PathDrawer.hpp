@@ -29,14 +29,14 @@ namespace mars_addons {
     protected:
 
     private:
-        osg_lines::Lines *lines, *point;
+        osg_lines::Lines *lines, *updated_lines, *point;
         std::vector<base::Trajectory> trajectories_3d;
 
         /**
          * This method gets the desired z-coordinate for a certain 2d position
          * */
         mars::interfaces::sReal getHeightFromScene(mars::interfaces::sReal x, mars::interfaces::sReal y);
-
+        void generate_3d_path();
         /**
          * This method needs to be reimplemented to be thread safe
          * */
