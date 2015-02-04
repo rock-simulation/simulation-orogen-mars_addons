@@ -89,8 +89,10 @@ void PathDrawer::postGraphicsUpdate(void )
     osg_lines::LinesFactory lF;
     if(lines != updated_lines){
         // clear old path
-        control->graphics->removeOSGNode(lines->getOSGNode());
-        delete lines;
+        if(lines){
+            control->graphics->removeOSGNode(lines->getOSGNode());
+            delete lines;
+        }
         lines = updated_lines;
 
         // draw it
