@@ -2,6 +2,7 @@
 
 #include "PathDrawer.hpp"
 #include <base/Logging.hpp>
+#include <mars/interfaces/sim/ControlCenter.h>
 
 using namespace mars_addons;
 
