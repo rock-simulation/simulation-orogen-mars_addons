@@ -9,6 +9,7 @@
   <!-- Dependencies are resolved via osdep file in the autoproj configuration -->
   <depend package="simulation/orogen/mars" />
   <depend package="simulation/mars/common/graphics/osg_lines" />
+  <depend package="tools/configmaps" />
   <versioncontrol type="git" url="" />
   <export>
     <cpp cflags="" lflags="" />
