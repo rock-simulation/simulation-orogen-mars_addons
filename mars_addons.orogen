@@ -2,6 +2,8 @@ name 'mars_addons'
 
 using_library "osg_lines", :typekit => false
 using_library "configmaps", :typekit => false
+using_library "data_broker"
+using_library "mars_interfaces"
 
 using_task_library "mars"
 
