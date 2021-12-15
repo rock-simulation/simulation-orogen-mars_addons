@@ -75,7 +75,7 @@ void PathDrawer::cleanupHook()
 
 mars::interfaces::sReal PathDrawer::getHeightFromScene(mars::interfaces::sReal x, mars::interfaces::sReal y)
 {
-    mars::interfaces::PhysicsInterface* physics = control->sim->getPhysics();
+  mars::interfaces::PhysicsInterface* physics = control->sim->getPhysics().get();
     mars::interfaces::sReal z = 10.0;
     const mars::utils::Vector ray_origin(x, y, z);
     const mars::utils::Vector ray_vector(0.0, 0.0, -20);
